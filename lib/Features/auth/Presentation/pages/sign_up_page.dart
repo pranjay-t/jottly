@@ -7,6 +7,7 @@ import 'package:jottly/Features/auth/Presentation/bloc/auth_bloc.dart';
 import 'package:jottly/Features/auth/Presentation/pages/login_page.dart';
 import 'package:jottly/Features/auth/Presentation/widgets/auth_field.dart';
 import 'package:jottly/Features/auth/Presentation/widgets/auth_gradient_button.dart';
+import 'package:jottly/Features/blog/presentation/pages/home_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -35,12 +36,19 @@ class _SignUpPageState extends State<SignUpPage> {
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if(state is AuthFailure){
+            if (state is AuthFailure) {
               showSnackbar(context, state.message);
+            }
+            if (state is AuthSuccess) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => BlogPage()),
+                (route) => false,
+              );
             }
           },
           builder: (context, state) {
-            if(state is AuthLoading){
+            if (state is AuthLoading) {
               return Loader();
             }
             return Form(

@@ -1,9 +1,12 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:jottly/Core/error/exception.dart';
+import 'package:jottly/Core/error/failure.dart';
 import 'package:jottly/Features/auth/Data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 abstract interface class AuthRemoteDataSources {
+  Session? get currentUserSession;
+
   Future<UserModel> signInWithEmailPassword({
     required String email,
     required String password,
@@ -14,11 +17,16 @@ abstract interface class AuthRemoteDataSources {
     required String email,
     required String password,
   });
+
+  Future<UserModel?> getCurrentUserData();
 }
 
 class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
   final SupabaseClient supabaseClient;
   AuthRemoteDataSourcesImpl(this.supabaseClient);
+
+  @override
+  Session? get currentUserSession => supabaseClient.auth.currentSession;
 
   @override
   Future<UserModel> signInWithEmailPassword({
@@ -30,12 +38,10 @@ class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
         password: password,
         email: email,
       );
-      if(response == null){
-        throw ServerException('Login Failed due to unknow error');
-      }
       return UserModel.fromJson(response.user!.toJson());
-    } catch (e) {
-      print('authLoginError:$e');
+    }on sb.AuthException catch (e) {
+      throw ServerException(e.message);
+    }  catch (e) {
       throw ServerException(e.toString());
     }
   }
@@ -56,8 +62,27 @@ class AuthRemoteDataSourcesImpl implements AuthRemoteDataSources {
         throw ServerException('User is null');
       }
       return UserModel.fromJson(response.user!.toJson());
+    } on sb.AuthException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      print('authSignUpError:$e');
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<UserModel?> getCurrentUserData() async{
+    try {
+      if (currentUserSession != null) {
+        final userData = await supabaseClient.from('profiles').select().eq(
+              'id',
+              currentUserSession!.user.id,
+            );
+          return UserModel.fromJson(userData.first);
+      }
+      return null;
+    } on sb.AuthException catch (e) {
+      throw ServerException(e.message);
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }

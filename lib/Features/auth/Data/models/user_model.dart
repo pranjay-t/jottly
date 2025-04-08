@@ -1,4 +1,4 @@
-import 'package:jottly/Features/auth/Domain/entities/user.dart';
+import 'package:jottly/Core/common/entities/user.dart';
 
 class UserModel extends User {
   UserModel({

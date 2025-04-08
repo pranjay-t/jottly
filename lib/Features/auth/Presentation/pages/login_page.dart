@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jottly/Core/Theme/app_pallete.dart';
 import 'package:jottly/Core/common/widgets/loader.dart';
-import 'package:jottly/Core/error/failure.dart';
 import 'package:jottly/Core/utils/show_snackbar.dart';
 import 'package:jottly/Features/auth/Presentation/bloc/auth_bloc.dart';
 import 'package:jottly/Features/auth/Presentation/pages/sign_up_page.dart';
 import 'package:jottly/Features/auth/Presentation/widgets/auth_field.dart';
 import 'package:jottly/Features/auth/Presentation/widgets/auth_gradient_button.dart';
+import 'package:jottly/Features/blog/presentation/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,6 +36,13 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             if(state is AuthFailure){
               showSnackbar(context, state.message);
+            }
+            if (state is AuthSuccess) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => BlogPage()),
+                (route) => false,
+              );
             }
           },
           builder: (context, state) {

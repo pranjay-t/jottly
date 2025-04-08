@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:jottly/Core/error/failure.dart';
 import 'package:jottly/Core/usecase/usecase.dart';
-import 'package:jottly/Features/auth/Domain/entities/user.dart';
+import 'package:jottly/Core/common/entities/user.dart';
 import 'package:jottly/Features/auth/Domain/repository/auth_repository.dart';
 
 class UserSignUp implements UseCase<User, UserSignUpParams> {
